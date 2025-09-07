@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'ratelimit',
+    'rest_framework',
     'ip_tracking',
 ]
 
@@ -128,4 +130,24 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Optional: configure django-ip-geolocation settings
 IP_GEOLOCATION_SETTINGS = {
     'ENABLE_REQUEST_HOOK': True,  # Ensure geolocation is attached to request
+}
+
+REST_FRAMEWORK = {
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "5/minute",   # anonymous users → 5 requests/min
+        "user": "10/minute",  # authenticated users → 10 requests/min
+    },
+}
+
+# settings.py
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+    }
 }
