@@ -1,5 +1,6 @@
 from django.http import HttpResponseForbidden
-
+import time
+from django.core.cache import cache
 from .models import RequestLog
 from .models import BlockedIP
 
@@ -13,13 +14,17 @@ class IPTrackingMiddleware:
 
         if self.is_ip_blocked(ip_address):
             return HttpResponseForbidden("Your IP has been blocked.")
-
+        
+        geo_data = IPTrackingMiddleware.get_cached_geolocation(ip_address, request)
+        
         user = request.user if request.user.is_authenticated else None
         # Log the request
         RequestLog.objects.create(
             user=user,
             ip_address=ip_address, 
-            path=path
+            path=path,
+            country=geo_data.get("country"),
+            city=geo_data.get("city")
             )
 
         response = self.get_response(request)
@@ -36,3 +41,23 @@ class IPTrackingMiddleware:
     def is_ip_blocked(self, ip_address):
         return BlockedIP.objects.filter(ip_address=ip_address).exists()
     
+    @staticmethod
+    def get_cached_geolocation(ip, request):
+        """
+        Return a dict with 'country' and 'city' for the given IP,
+        using the cache for 24 hours.
+        """
+        cache_key = f"geo:{ip}"
+        geo_data = cache.get(cache_key)
+        if geo_data:
+            return geo_data
+
+        location = getattr(request, "geolocation", None)
+        geo_data = {
+            "country": getattr(location, "country_name", None),
+            "city": getattr(location, "city", None)
+        }
+        cache.set(cache_key, geo_data, timeout=24*3600)
+        return geo_data
+
+        
