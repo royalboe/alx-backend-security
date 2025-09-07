@@ -1,0 +1,50 @@
+# -------------------------
+# Django Core
+# -------------------------
+Django
+djangorestframework
+django-cors-headers
+django-environ
+django-ipware
+django-redis
+django-ratelimit
+drf-yasg
+sqlparse
+tzdata
+asgiref
+
+# -------------------------
+# Database Drivers
+# -------------------------
+mysqlclient
+psycopg2-binary
+
+# -------------------------
+# Celery & Task Queue
+# -------------------------
+celery
+amqp
+billiard
+kombu
+vine
+redis
+
+# -------------------------
+# API & HTTP Utilities
+# -------------------------
+requests
+urllib3
+certifi
+idna
+charset-normalizer
+uritemplate
+PyYAML
+ipinfo
+
+# -------------------------
+# Utilities & Dependencies
+# -------------------------
+python-dateutil
+six
+inflection
+packaging
